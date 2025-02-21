@@ -18,7 +18,7 @@ def fetch_rx_records(page_size, offset):
         if connection:
             cursor = connection.cursor()    
             query = """SELECT id, lente_descripcion, tipo_lente_descripcion, clinica FROM "rx" WHERE fecha > %s ORDER BY id LIMIT %s OFFSET %s;"""
-            datetime_param = datetime.date(2023, 12, 31)  # Example datetime parameter
+            datetime_param = datetime.date(2018, 12, 31)  # Example datetime parameter
             cursor.execute(query, (datetime_param, page_size, offset))  # Pass datetime_param as a tuple
             columns = [desc[0] for desc in cursor.description] # Get column names
             results = [dict(zip(columns, row)) for row in cursor.fetchall()] # Map rows to dictionaries
@@ -75,7 +75,7 @@ def execute_update_query(sql):
             cursor = connection.cursor()
             cursor.execute(sql)
             connection.commit()
-            logger.info(sql)
+            # logger.info(sql)
     except psycopg2.Error as e:
         logger.error(f"Error al ejecutar SQL: {sql}")
     finally:
