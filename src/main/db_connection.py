@@ -8,7 +8,7 @@ from src.main.utils.logger_config import setup_logger
 
 # Minimum and maximum pool size
 MIN_CONNECTIONS = 2
-MAX_CONNECTIONS = 5
+MAX_CONNECTIONS = 10
 
 logger = setup_logger("erposm -")
 

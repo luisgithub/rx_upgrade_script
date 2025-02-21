@@ -18,19 +18,19 @@ def fetch_rx_records(page_size, offset):
         if connection:
             cursor = connection.cursor()    
             query = """SELECT id, lente_descripcion, tipo_lente_descripcion, clinica FROM "rx" WHERE fecha > %s ORDER BY id LIMIT %s OFFSET %s;"""
-            datetime_param = datetime.date(2024, 12, 31)  # Example datetime parameter
+            datetime_param = datetime.date(2023, 12, 31)  # Example datetime parameter
             cursor.execute(query, (datetime_param, page_size, offset))  # Pass datetime_param as a tuple
             columns = [desc[0] for desc in cursor.description] # Get column names
             results = [dict(zip(columns, row)) for row in cursor.fetchall()] # Map rows to dictionaries
-            cursor.close()
-            pool_manager.put_connection(connection)  # Release the connection
+
             return results
         else:
             return []
     except psycopg2.Error as e:
         logger.error(f"Error while fetching rx data: {e}")
-    # finally:
-    #     pool_manager.close_pool() #close the pool when done.
+    finally:
+        cursor.close()
+        pool_manager.put_connection(connection)  # Release the connection
 
 def get_id_tipo_producto_by_description(tipo_desc):
     Dict = {
@@ -48,20 +48,37 @@ def get_id_producto_by_description_and_clinic(producto_descripcion, clinica):
         connection = get_connection()
         if(connection):
             cursor = connection.cursor()
-            logger.info(f"Parametros: {clinica}")
             query = "SELECT id FROM producto p WHERE p.clinica = %s AND p.descripcion = %s "
             params = (int(clinica), producto_descripcion)
             cursor.execute(query, params)
             result = cursor.fetchone()
             if result is None:
                 return None
-            if cursor.fetchone() is not None:  # Check if there's another row
-                raise Exception("Query returned more than one result.  Expected single result.")
+            if len(result) > 1:
+                logger.info(f"Producto duplicado: {producto_descripcion}")
+                return None
+            # if cursor.fetchone() is not None:  # Check if there's another row
+            #     raise Exception("Query returned more than one result.  Expected single result.")
             return result[0]
     except psycopg2.Error as e:  # Handle database errors
         logger.error(f"Error while fetching product data : {e}")
         return None  
+    finally:
+        cursor.close()
+        pool_manager.put_connection(connection)
 
+
+def execute_update_query(sql):
+    try:
+        connection = get_connection()
+        if(connection):
+            cursor = connection.cursor()
+            cursor.execute(sql)
+    except psycopg2.Error as e:
+        logger.error(f"Error al ejecutar SQL: {sql}")
+    finally:
+        cursor.close()
+        pool_manager.put_connection(connection)
 
 def close():
     pool_manager.close_pool() #close the pool when done.
