@@ -42,7 +42,6 @@ def update_field(record):
         else:
             query_update = f"UPDATE rx SET lente_rx = {producto_id},  tipo_lente_rx = {tipo_lente_id} WHERE id = {rx_id};"
             execute_update_query(query_update)
-            logger.info(query_update)
             
     
 

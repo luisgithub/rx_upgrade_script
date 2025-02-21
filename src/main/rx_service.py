@@ -74,6 +74,8 @@ def execute_update_query(sql):
         if(connection):
             cursor = connection.cursor()
             cursor.execute(sql)
+            connection.commit()
+            logger.info(sql)
     except psycopg2.Error as e:
         logger.error(f"Error al ejecutar SQL: {sql}")
     finally:
