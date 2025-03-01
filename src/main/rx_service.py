@@ -103,9 +103,9 @@ def fetch_rx_records_color(page_size, offset):
         connection = get_connection()
         if connection:
             cursor = connection.cursor()
-            query = '''SELECT id, color FROM rx ORDER BY id LIMIT %s OFFSET %s;'''
-            cursor.execute(query, (page_size, offset))
-            cursor.fetchall()
+            query = """SELECT id, color FROM rx ORDER BY id DESC LIMIT %s OFFSET %s;"""
+            logger.info(f"query execution: {query}")
+            cursor.execute(query, (page_size, offset,))
             columns = [desc[0] for desc in cursor.description]
             results = [dict(zip(columns, row)) for row in cursor.fetchall()]
             return results
@@ -113,6 +113,9 @@ def fetch_rx_records_color(page_size, offset):
             return []
     except psycopg2.Error as e:
         logger.error(f"Error al ejecutar SQL: {query}")
+    finally:
+        cursor.close()
+        pool_manager.put_connection(connection)  # Release the connection
 
 def close():
     pool_manager.close_pool() #close the pool when done.

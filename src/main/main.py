@@ -23,7 +23,6 @@ def process_update_lente_field():
             for record in records:
                 update_lente_field(record)
             offset += page_size
-            updated_rec_counter += len(records)
         else:
             logger.info("No more lente records found in DB..")
             break
@@ -33,14 +32,17 @@ def process_update_color_field():
     page_size = 100
     offset = 0
     updated_rec_counter = 0
+    page_counter = 0
     while True:
-        records = fetch_rx_records_color()
+        records = fetch_rx_records_color(page_size, offset)
         if records:
-            logger.info(f"len{records} rx color records fetched from DB.." )
+            logger.info(f"{len(records)} rx color records fetched from DB.." )
             for record in records:
-                update_color_field()
+                update_color_field(record)
             offset += page_size
             updated_rec_counter += len(records)
+            page_counter += 1
+            logger.info(f"Page {page_counter} has been processed..")
         else:
             logger.info(f"No more color records found in DB..")
             break
