@@ -42,6 +42,21 @@ def get_id_tipo_producto_by_description(tipo_desc):
         'Vision Sencilla':'6',
     }
     return Dict[tipo_desc]
+def get_id_color_by_descripcion(desc):
+    Dict = {
+        'GRIS 1':1,
+        'GRIS 2':2, 
+        'GRIS 3':3,	
+        'CAFE 1':4,
+        'CAFE 2':5,	
+        'CAFE 3':6,	
+        'AMARILLO':7,	
+        'AZUL':8,	
+        'MARINO':9,	
+        'VERDE':10,	
+        'SAHARA':11,	
+        'ROSA':12	
+    }
 
 def get_id_producto_by_description_and_clinic(producto_descripcion, clinica):
     try:
@@ -81,6 +96,23 @@ def execute_update_query(sql):
     finally:
         cursor.close()
         pool_manager.put_connection(connection)
+
+
+def fetch_rx_records_color(page_size, offset):
+    try:
+        connection = get_connection()
+        if connection:
+            cursor = connection.cursor()
+            query = '''SELECT id, color FROM rx ORDER BY id LIMIT %s OFFSET %s;'''
+            cursor.execute(query, (page_size, offset))
+            cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            return results
+        else:
+            return []
+    except psycopg2.Error as e:
+        logger.error(f"Error al ejecutar SQL: {query}")
 
 def close():
     pool_manager.close_pool() #close the pool when done.
