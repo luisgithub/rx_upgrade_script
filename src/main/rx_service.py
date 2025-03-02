@@ -42,6 +42,7 @@ def get_id_tipo_producto_by_description(tipo_desc):
         'Vision Sencilla':'6',
     }
     return Dict[tipo_desc]
+
 def get_id_color_by_descripcion(desc):
     Dict = {
         'GRIS 1':1,
@@ -57,6 +58,7 @@ def get_id_color_by_descripcion(desc):
         'SAHARA':11,	
         'ROSA':12	
     }
+    return Dict[desc]
 
 def get_id_producto_by_description_and_clinic(producto_descripcion, clinica):
     try:
@@ -103,7 +105,7 @@ def fetch_rx_records_color(page_size, offset):
         connection = get_connection()
         if connection:
             cursor = connection.cursor()
-            query = """SELECT id, color FROM rx ORDER BY id DESC LIMIT %s OFFSET %s;"""
+            query = """SELECT id, color FROM rx WHERE color IS NOT NULL AND color <> '' AND color  ~ '^[+-]?\d+(\.\d+)?$' = false ORDER BY id DESC LIMIT %s OFFSET %s;"""
             logger.info(f"query execution: {query}")
             cursor.execute(query, (page_size, offset,))
             columns = [desc[0] for desc in cursor.description]

@@ -68,11 +68,12 @@ def update_color_field(record):
     rx_id = record.get('id')
     current_value = record.get('color')
     
-    if current_value != None and not current_value.isdigit():
+    if current_value != None:
+        logger.info(f"looking for color in row: {record}")
         color_id = get_id_color_by_descripcion(current_value)
         query_update = f"UPDATE rx SET color_armazon = {color_id} WHERE id = {rx_id};"
-        # execute_update_query(query_update)
-        logger.info(query_update)
+        execute_update_query(query_update)
+        # logger.info(query_update)
 
 
 if __name__ == "__main__":
